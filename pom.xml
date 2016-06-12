@@ -11,15 +11,36 @@
 	<url>https://github.com/basecn/kv-cached-db</url>
 
 	<modules>
-	<module>kv-cached-db-server</module>
-	<module>kv-cache-db-driver</module>
-	<module>kv-cached-db-driver</module>
-	<module>kv-cached-db-core</module>
+		<module>kv-cached-db-server</module>
+		<module>kv-cached-db-driver</module>
+		<module>kv-cached-db-core</module>
 	</modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.2</version><!-- 激活持续集成平台 -->
+					<configuration>
+						<source>1.8</source>
+						<target>1.8</target>
+						<encoding>UTF-8</encoding>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>2.5.3</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 
 	<dependencies>
 		<dependency>

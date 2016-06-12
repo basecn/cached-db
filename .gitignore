@@ -1,0 +1,21 @@
+################################################################################
+# Git Ignore file
+#
+#
+################################################################################
+
+# Ignore all resources files
+.*
+
+# Ignore logs and compile result
+logs/
+target/
+logs/*
+output/*
+
+# mid files
+dependency-reduced-pom.xml
+*.jar
+
+# Include git ignore
+!/.gitignore

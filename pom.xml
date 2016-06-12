@@ -70,12 +70,6 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- kv-cluster-core -->
-			<dependency>
-				<groupId>cn.ctyun.bigdata</groupId>
-				<artifactId>kv-cluster-core</artifactId>
-			</dependency>
-
 			<!-- http://mvnrepository.com/artifact/com.google.guava/guava -->
 			<!-- java工具 -->
 			<dependency>
@@ -161,6 +155,14 @@
 			<dependency>
 				<groupId>org.codehaus.jackson</groupId>
 				<artifactId>jackson-core-asl</artifactId>
+			</dependency>
+
+			<!-- http://mvnrepository.com/artifact/junit/junit -->
+			<!-- 测试套件 -->
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.12</version>
 			</dependency>
 
 		</dependencies>

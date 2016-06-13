@@ -59,15 +59,18 @@ public class BootKvServer {
 		// log4j-slf4j, default: log4j.properties
 
 		// show start window
-
-		loadfileAndShow("kvClusterInitiator.txt");
+		final String key = "cached-db.welcome";
+		String welcome = "kvClusterInitiator.txt";
+		if (System.getProperties().contains(key)) {
+			welcome = (String) System.getProperties().get(key);
+		}
+		loadfileAndShow(welcome);
 
 		Options options = buildCliOptions();
-		final CommandLine cmd;
+		CommandLine cmd = parseAndCheckCli(args);
 		CompositeConfiguration config = null;
 		try {
 			// 解析命令行
-			options = buildCliOptions();
 			cmd = new DefaultParser().parse(options, args);
 			// 加载配置文件
 			config = loadConfiguration(cmd);
@@ -112,6 +115,38 @@ public class BootKvServer {
 		CachedDbServer server = new CachedDbServer(cmd, config);
 		server.start();
 
+	}
+
+
+	private static final CommandLine parseAndCheckCli(String[] args) {
+		Options options = buildCliOptions();
+		CompositeConfiguration config = null;
+		try {
+			// 解析命令行
+			options = buildCliOptions();
+			CommandLine cmd = new DefaultParser().parse(options, args);
+			// 加载配置文件
+			config = loadConfiguration(cmd);
+			return cmd;
+		} catch (ConfigurationException | ParseException e1) {
+			LOG.error("Loading Cli or Config error. ", e1);
+			return null;
+		} finally {
+			// 输入帮助信息
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp("[-lsp]", options);
+			System.out.println("");
+			System.out.println("");
+
+			LOG.info("[Application's configuration] ({} items)", config.getNumberOfConfigurations());
+			if (null != config) {
+				Iterator<String> keys = config.getKeys();
+				while (keys.hasNext()) {
+					String k = keys.next();
+					LOG.info(" | {}:[{}]", k, config.getProperty(k));
+				}
+			}
+		}
 	}
 
 
@@ -164,6 +199,7 @@ public class BootKvServer {
 	 * @param file classpath内的文件名
 	 */
 	public static final void loadfileAndShow(String file) {
+
 		byte[] buf = new byte[1024];
 		int len = 0;
 		StringBuilder sb = new StringBuilder();

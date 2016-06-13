@@ -16,6 +16,13 @@
 	</properties>
 
 	<dependencies>
+		<!-- 日志处理框架 -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
 		<!-- Google的java工具 -->
 		<dependency>
 			<groupId>com.google.guava</groupId>

@@ -20,7 +20,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -33,11 +38,10 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.SystemConfiguration;
 import org.apache.log4j.PropertyConfigurator;
+import org.kv.cached.db.server.CachedDbException;
 import org.kv.cached.db.server.app.KvClusterInitiator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.netty.util.internal.StringUtil;
 
 /**
  * KvServer启动类
@@ -53,100 +57,71 @@ public class BootKvServer {
 	 * 启动方法
 	 * 
 	 * @param args
+	 * @throws CachedDbException
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws CachedDbException {
 
 		// log4j-slf4j, default: log4j.properties
 
-		// show start window
+		// 1. 显示欢迎窗口
 		final String key = "cached-db.welcome";
-		String welcome = "kvClusterInitiator.txt";
+		String welcome = "cached-db.welcome-info.txt";
 		if (System.getProperties().contains(key)) {
 			welcome = (String) System.getProperties().get(key);
 		}
 		loadfileAndShow(welcome);
 
+		// 2. 创建命令行参数定义
 		Options options = buildCliOptions();
-		CommandLine cmd = parseAndCheckCli(args);
+		// 输出命令行参数的完全定义和帮助信息
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.printHelp("[-lsp]", options);
+		System.out.println("");
+
+		// 3. 解析命令行
+		final CommandLine cmd;
+		// try {
+		try {
+			cmd = new DefaultParser().parse(options, args);
+			// 输出传入的命令行参数
+			Stream<Option> stream = Arrays.stream(cmd.getOptions());
+			Map<String, String> realArgs = stream
+					.collect(Collectors.toMap(Option::getOpt, (Option a) -> cmd.getOptionValue(a.getOpt())));
+			realArgs.entrySet().stream()//
+					.sorted(Comparator.comparing(a -> a.hashCode()))
+					.forEach((Map.Entry<String, String> e) -> LOG.info("{} -> {}", e.getKey(), e.getValue()));
+		} catch (ParseException e2) {
+			throw new CachedDbException(e2);
+		}
+
+		// 4. 加载配置参数
 		CompositeConfiguration config = null;
 		try {
-			// 解析命令行
-			cmd = new DefaultParser().parse(options, args);
-			// 加载配置文件
 			config = loadConfiguration(cmd);
-		} catch (ConfigurationException | ParseException e1) {
-			LOG.error("Loading Cli or Config error. ", e1);
-			return;
+		} catch (ConfigurationException e1) {
+			throw new CachedDbException("Load configuration error.", e1);
 		} finally {
-			// 输入帮助信息
-			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp("[-lsp]", options);
-			System.out.println("");
-			System.out.println("");
-
-			LOG.info("[Application's configuration] ({} items)", config.getNumberOfConfigurations());
-			if (null != config) {
-				Iterator<String> keys = config.getKeys();
-				while (keys.hasNext()) {
-					String k = keys.next();
-					LOG.info(" | {}:[{}]", k, config.getProperty(k));
-				}
-			}
+			Optional<CompositeConfiguration> nullable = Optional.ofNullable(config);
+			nullable.ifPresent(e -> {
+				LOG.info("[Application's configuration] ({} items)", e.getNumberOfConfigurations());
+				Iterator<String> keys = e.getKeys();
+				keys.forEachRemaining(k -> LOG.info(" | {}:[{}]", k, e.getProperty(k)));
+			});
 		}
 
-		// Init Logger
+		// 5. 加载自定义目志配置文件
 		if (cmd.hasOption("lc")) {
 			String v = cmd.getOptionValue("lc");
-			if (!StringUtil.isNullOrEmpty(v)) {
+			Optional.ofNullable(v).ifPresent(e -> {
 				LOG.info("Loading logger config [{}]", v);
 				PropertyConfigurator.configure(v);
-			}
+			});
 		}
 
-		// 输出 启动参数
-		Arrays.stream(cmd.getOptions()).forEach((Option e) -> {
-			String k = e.getOpt();
-			String v = cmd.getOptionValue(k);
-			if (cmd.hasOption(k) && !StringUtil.isNullOrEmpty(v)) {
-				LOG.info("> {}=[{}] (-{})", k, v);
-			}
-		});
-
+		// 启动服务
 		CachedDbServer server = new CachedDbServer(cmd, config);
 		server.start();
 
-	}
-
-
-	private static final CommandLine parseAndCheckCli(String[] args) {
-		Options options = buildCliOptions();
-		CompositeConfiguration config = null;
-		try {
-			// 解析命令行
-			options = buildCliOptions();
-			CommandLine cmd = new DefaultParser().parse(options, args);
-			// 加载配置文件
-			config = loadConfiguration(cmd);
-			return cmd;
-		} catch (ConfigurationException | ParseException e1) {
-			LOG.error("Loading Cli or Config error. ", e1);
-			return null;
-		} finally {
-			// 输入帮助信息
-			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp("[-lsp]", options);
-			System.out.println("");
-			System.out.println("");
-
-			LOG.info("[Application's configuration] ({} items)", config.getNumberOfConfigurations());
-			if (null != config) {
-				Iterator<String> keys = config.getKeys();
-				while (keys.hasNext()) {
-					String k = keys.next();
-					LOG.info(" | {}:[{}]", k, config.getProperty(k));
-				}
-			}
-		}
 	}
 
 

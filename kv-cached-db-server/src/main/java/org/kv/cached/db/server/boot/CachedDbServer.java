@@ -37,12 +37,12 @@ public final class CachedDbServer {
 	/**
 	 * 命令行
 	 */
-	public final CommandLine cmd;
+	private final CommandLine cmd;
 
 	/**
-	 * 配置文件
+	 * 配置参数
 	 */
-	public final Configuration config;
+	private final Configuration config;
 
 
 	/**
@@ -57,6 +57,9 @@ public final class CachedDbServer {
 	}
 
 
+	/**
+	 * 启动服务
+	 */
 	public synchronized void start() {
 		String cn = config.getString("kv-cluster-name");
 		// meta
@@ -83,4 +86,21 @@ public final class CachedDbServer {
 			e.printStackTrace();
 		}
 	}
+
+
+	/**
+	 * @return the cmd
+	 */
+	public final CommandLine getCmd() {
+		return cmd;
+	}
+
+
+	/**
+	 * @return the config
+	 */
+	public final Configuration getConfig() {
+		return config;
+	}
+
 }

@@ -74,10 +74,8 @@ public final class MetaStore {
 		objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
 		objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
 		// objectMapper.configure(JsonParser.Feature.INTERN_FIELD_NAMES, true);
-		// objectMapper.configure(JsonParser.Feature.CANONICALIZE_FIELD_NAMES,
-		// true);
-		// objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,a
-		// false);
+		// objectMapper.configure(JsonParser.Feature.CANONICALIZE_FIELD_NAMES,true);
+		// objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,a false);
 	}
 
 	private static final Map<String, MetaStore> storeMap = new ConcurrentHashMap<>();
@@ -120,7 +118,12 @@ public final class MetaStore {
 	}
 
 
-	public void start() {
+	/**
+	 * 启动元数据存储
+	 * 
+	 * @throws CachedDbException
+	 */
+	public final synchronized void start() throws CachedDbException {
 		if (started)
 			return;
 

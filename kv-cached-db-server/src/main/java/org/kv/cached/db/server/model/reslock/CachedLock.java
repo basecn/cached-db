@@ -21,7 +21,7 @@ import java.util.concurrent.locks.Lock;
 /**
  *
  */
-public interface CachedObject {
+public interface CachedLock {
 
 	Lock getReadLock();
 

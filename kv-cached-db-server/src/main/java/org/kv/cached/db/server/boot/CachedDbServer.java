@@ -60,7 +60,7 @@ public final class CachedDbServer {
 	/**
 	 * 启动服务
 	 */
-	public synchronized void start() {
+	public synchronized void start() throws CachedDbException {
 		String cn = config.getString("kv-cluster-name");
 		// meta
 		MetaStore ms = new MetaStore(cn, this);

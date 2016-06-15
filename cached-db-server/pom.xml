@@ -5,12 +5,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.ds</groupId>
-		<artifactId>kv-cached-db</artifactId>
+		<artifactId>cached-db</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>kv-cached-db-server</artifactId>
-	<name>kv-cached-db-server</name>
+	<artifactId>cached-db-server</artifactId>
+	<name>cached-db-server</name>
 
 	<properties>
 	</properties>

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.ds</groupId>
-	<artifactId>kv-cached-db</artifactId>
+	<artifactId>cached-db</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
@@ -11,9 +11,9 @@
 	<url>https://github.com/basecn/kv-cached-db</url>
 
 	<modules>
-		<module>kv-cached-db-server</module>
-		<module>kv-cached-db-driver</module>
-		<module>kv-cached-db-core</module>
+		<module>cached-db-server</module>
+		<module>cached-db-driver</module>
+		<module>cached-db-core</module>
 	</modules>
 
 	<properties>
